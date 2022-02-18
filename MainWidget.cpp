@@ -10,18 +10,7 @@ namespace jshark::forms {
     MainWidget::MainWidget(QWidget *parent) :
             QWidget(parent), ui(new Ui::MainWidget) {
         ui->setupUi(this);
-
-//        HINSTANCE hGetProcIDDLL = LoadLibrary(R"(C:\Users\Demetry Workstation\CLionProjects\j2534shark\cmake-build-debug\j2534\jshim.dll)");
-//
-//        if(!hGetProcIDDLL) {
-//            std::cout << "Could not load the DLL" << std::endl << std::flush;
-//        }
-//
-//        auto PassThruInit = (f_PassThruConnect)GetProcAddress(hGetProcIDDLL, "PassThruConnect");
-//        if(!PassThruInit) {
-//            std::cout << "Could not locate function" << std::endl;
-//        }
-
+        
         try {
             const QString PASSTHRU_REG_PATH = R"(HKEY_LOCAL_MACHINE\SOFTWARE\PassThruSupport.04.04)";
 
