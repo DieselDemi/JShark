@@ -10,7 +10,7 @@ namespace jshark::forms {
     MainWidget::MainWidget(QWidget *parent) :
             QWidget(parent), ui(new Ui::MainWidget) {
         ui->setupUi(this);
-        
+
         try {
             const QString PASSTHRU_REG_PATH = R"(HKEY_LOCAL_MACHINE\SOFTWARE\PassThruSupport.04.04)";
 
@@ -37,6 +37,7 @@ namespace jshark::forms {
                 &MainWidget::selectedDeviceChanged);
         connect(ui->selectOutputFileButton, &QPushButton::released, this, &MainWidget::selectOutputFile);
         connect(ui->installButton, &QPushButton::released, this, &MainWidget::install);
+        connect(ui->removeJSharkButton, &QPushButton::released, this, &MainWidget::uninstall);
     }
 
     MainWidget::~MainWidget() {
@@ -52,30 +53,49 @@ namespace jshark::forms {
     }
 
     void MainWidget::install() {
+        QMessageBox msgBox;
+
         if (this->filePath.isEmpty()) {
-            QMessageBox msgBox;
             msgBox.setText("Select a save file path first");
             msgBox.exec();
             return;
         }
         if (selectedDevice == -1) {
-            QMessageBox msgBox;
             msgBox.setText("Select a PassThru adapter first");
             msgBox.exec();
             return;
         }
 
         try {
+            if(QFile::exists("C:\\JSHARK.dll"))
+            {
+                if(QFile::remove("C:\\JSHARK.dll")) {
+                    if(!QFile::copy("./JSHARK.dll", "C:\\JSHARK.dll")) {
+                        msgBox.setText("Could not copy dll to the C:\\ drive... aborting.");
+                        msgBox.exec();
+                        return;
+                    }
+                } else  {
+                    msgBox.setText("Could not delete old JSHARK.dll file, please ensure it exists");
+                    msgBox.exec();
+                }
+            } else {
+                if(!QFile::copy("./JSHARK.dll", "C:\\JSHARK.dll")) {
+                    msgBox.setText("Could not copy dll to the C:\\ drive... aborting.");
+                    msgBox.exec();
+                    return;
+                }
+            }
+
+
             const QString JSHARK_REG_PATH = R"(HKEY_LOCAL_MACHINE\SOFTWARE\PassThruSupport.04.04)";
             QSettings settings(JSHARK_REG_PATH, QSettings::NativeFormat);
 
             QString functionLibrary = this->ui->deviceComboBox->currentData().toString();
 
-            QFile::copy("./JSHARK.dll", "C:\\JSHARK.dll");
-
             settings.beginGroup("JSHARK");
             settings.setValue("CAN", 0x1);
-            settings.setValue("ConfigApplication", "JShark.exe");
+            settings.setValue("ConfigApplication", "JSharkConfigurator.exe");
             settings.setValue("DeviceId", 0x0);
             settings.setValue("DllPath", functionLibrary);
             settings.setValue("FunctionLibrary", "C:\\JSHARK.dll"); //TODO
@@ -100,6 +120,19 @@ namespace jshark::forms {
             msgBox.setText("Something went wrong");
             msgBox.exec();
         }
+    }
+
+    void MainWidget::uninstall() {
+        if(!QFile::remove("C:\\JSHARK.dll")) {
+            QMessageBox msgBox;
+            msgBox.setText("Could not remove dll from the C:\\ drive, will still uninstall registry values.");
+            msgBox.exec();
+        }
+
+        const QString JSHARK_REG_PATH = R"(HKEY_LOCAL_MACHINE\SOFTWARE\PassThruSupport.04.04)";
+        QSettings settings(JSHARK_REG_PATH, QSettings::NativeFormat);
+
+        settings.remove("JSHARK");
     }
 
 } // jshark::forms

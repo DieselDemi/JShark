@@ -127,6 +127,7 @@ namespace JShark
 	 */
 	void ShimStop()
 	{
+        logger.LogError("MSG: Stopped JShark");
 		logger.CloseLog();
 
 		if (shim_hasLibraryLoaded())
@@ -154,6 +155,8 @@ namespace JShark
 		logFilePath = Helpers::StringConversion::ToStdString(wLogFilePath); 
 
 		logger.OpenLog(logFilePath);
+
+        logger.LogError("MSG: Started JShark");
 
 		return true; 
 	}

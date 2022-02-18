@@ -26,6 +26,7 @@ namespace jshark::forms {
         void selectedDeviceChanged(int idx);
         void selectOutputFile();
         void install();
+        void uninstall();
     };
 } // jshark::forms
 

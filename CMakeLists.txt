@@ -55,3 +55,9 @@ if (WIN32)
                 "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
     endforeach (QT_LIB)
 endif ()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/jshark/jshark.dll"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/JSHARK.dll"
+    )
