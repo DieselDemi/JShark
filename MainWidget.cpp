@@ -116,7 +116,6 @@ namespace jshark::forms {
             settings.endGroup();
 
         } catch (std::exception &e) {
-            QMessageBox msgBox;
             msgBox.setText("Something went wrong");
             msgBox.exec();
         }
