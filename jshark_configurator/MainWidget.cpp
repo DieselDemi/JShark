@@ -49,7 +49,7 @@ namespace jshark::forms {
     }
 
     void MainWidget::selectOutputFile() {
-        this->filePath = QFileDialog::getSaveFileName(this, "/home", tr("Log Files (*.log)"));
+        this->filePath = QFileDialog::getSaveFileName(this, "JShark", tr("/home/"), tr("Log Files (*.log)"));
     }
 
     void MainWidget::install() {
@@ -113,6 +113,19 @@ namespace jshark::forms {
             settings.setValue("LogPath", filePath);
             settings.setValue("Name", "JSHARK Shim");
             settings.setValue("Vendor", "Diesel Demi");
+
+            settings.setValue("IgnoreRead", false); //TODO(Demi): Add the checkbox values here
+            settings.setValue("IgnoreWrite", false); //TODO(Demi): Add the checkbox values here
+            settings.setValue("IgnoreIoctl", false); //TODO(Demi): Add the checkbox values here
+            settings.setValue("IgnoreVersion", false); //TODO(Demi): Add the checkbox values here
+            settings.setValue("IgnoreOpen", false); //TODO(Demi): Add the checkbox values here
+            settings.setValue("IgnoreError", false); //TODO(Demi): Add the checkbox values here
+            settings.setValue("IgnoreSetVoltage", false); //TODO(Demi): Add the checkbox values here
+            settings.setValue("IgnoreFilters", false); //TODO(Demi): Add the checkbox values here
+            settings.setValue("IgnorePeriodics", false); //TODO(Demi): Add the checkbox values here
+            settings.setValue("IgnoreConnect", false); //TODO(Demi): Add the checkbox values here
+            settings.setValue("SaveDataOutput", true); //TODO(Demi): Add the checkbox values here
+            settings.setValue("SaveDataToSingleFile", true); //TODO(Demi): Add the checkbox values here
             settings.endGroup();
 
         } catch (std::exception &e) {

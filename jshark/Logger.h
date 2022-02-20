@@ -30,8 +30,13 @@ namespace JShark {
         bool IgnoreIoctl = false;
         bool IgnoreVersion = false;
         bool IgnoreOpen = false;
+        bool IgnoreError = false;
+        bool IgnoreSetVoltage = false;
+        bool IgnoreFilters = false;
+        bool IgnorePeriodics = false;
+        bool IgnoreConnect = false;
         bool SaveDataOutput = true;
-        bool SaveDataToSingleFile = false;
+        bool SaveDataToSingleFile = true;
         DataDisplayType BinaryDisplayType = static_cast<DataDisplayType>(NO_DISPLAY);
         TransmitMessageType MessageType = TransmitMessageType::TX;
 //        DataDisplayType BinaryDisplayType = static_cast<DataDisplayType>(HEX_VALUES_IN_TEXT | PRECEDING_ZERO_X | COMMA_DELIM);

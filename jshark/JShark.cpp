@@ -42,12 +42,6 @@ namespace JShark {
     static Logger logger(logFilePath);
 
     bool shim_loadLibrary(const std::wstring &szDLL) {
-        // Can't load a library if the string is NULL
-        // if (szDLL == NULL)
-        // {
-        // 	return false;
-        // }
-
         // Can't load a library if there's one currently loaded
         if (fLibLoaded) {
             return false;
@@ -57,6 +51,7 @@ namespace JShark {
         if (hDLL == NULL) {
             // Try to get the error text
             // Set the internal error text based on the win32 message
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not load device library");
             return false;
         }
 
@@ -141,12 +136,36 @@ namespace JShark {
             return false;
         if (JSharkRegistry::GetStringRegKey(hKey, L"LogPath", wLogFilePath, L"output.log") != ERROR_SUCCESS)
             return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreRead", logSettings.IgnoreRead, false))
+            return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreWrite", logSettings.IgnoreWrite, false))
+            return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreIoctl", logSettings.IgnoreIoctl, false))
+            return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreVersion", logSettings.IgnoreVersion, false))
+            return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreOpen", logSettings.IgnoreOpen, false))
+            return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreError", logSettings.IgnoreError, false))
+            return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreSetVoltage", logSettings.IgnoreSetVoltage, false))
+            return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreFilters", logSettings.IgnoreFilters, false))
+            return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnorePeriodics", logSettings.IgnorePeriodics, false))
+            return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreConnect", logSettings.IgnoreConnect, false))
+            return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"SaveDataOutput", logSettings.SaveDataOutput, false))
+            return false;
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"SaveDataToSingleFile", logSettings.SaveDataToSingleFile, false))
+            return false;
 
         //TODO(Demi): Add all the settings here
 
         //FUCK WINDOWS AND EVERYTHING IT STANDS FOR
         logFilePath = Helpers::StringHelpers::ToStdString(wLogFilePath);
-        
+
         logger.OpenLog(logFilePath, logSettings);
 
         logger.LogMessage("MSG: Started JShark");
@@ -167,7 +186,8 @@ namespace JShark {
 
         last_error = _PassThruOpen(pName, pDeviceID);
 
-        logger.LogData("PassThruOpen(%v, %u); = %c", pName, *pDeviceID, last_error);
+        if (!logSettings.IgnoreOpen)
+            logger.LogData("PassThruOpen(%v, %u); = %c", pName, *pDeviceID, last_error);
 
         return last_error;
     }
@@ -182,7 +202,8 @@ namespace JShark {
 
         last_error = _PassThruClose(DeviceID);
 
-        logger.LogData("PassThruClose(%u); = %c", DeviceID, last_error);
+        if (!logSettings.IgnoreOpen)
+            logger.LogData("PassThruClose(%u); = %c", DeviceID, last_error);
 
         return last_error;
     }
@@ -198,13 +219,14 @@ namespace JShark {
 
         last_error = _PassThruConnect(DeviceID, ProtocolID, Flags, Baudrate, pChannelID);
 
-        logger.LogData("PassThruConnect(%u, %r, %x, %u, %u); = %c",
-                       DeviceID,
-                       ProtocolID,
-                       Flags,
-                       Baudrate,
-                       *pChannelID,
-                       last_error);
+        if (!logSettings.IgnoreConnect)
+            logger.LogData("PassThruConnect(%u, %r, %x, %u, %u); = %c",
+                           DeviceID,
+                           ProtocolID,
+                           Flags,
+                           Baudrate,
+                           *pChannelID,
+                           last_error);
 
         return last_error;
     }
@@ -220,7 +242,8 @@ namespace JShark {
 
         last_error = _PassThruDisconnect(ChannelID);
 
-        logger.LogData("PassThruDisconnect(%u); = %c", ChannelID, last_error);
+        if (!logSettings.IgnoreConnect)
+            logger.LogData("PassThruDisconnect(%u); = %c", ChannelID, last_error);
 
         return last_error;
     }
@@ -237,7 +260,8 @@ namespace JShark {
 
         last_error = _PassThruReadMsgs(ChannelID, pMsg, pNumMsgs, Timeout);
 
-        logger.LogData("PassThruReadMsgs(%u, %p, %u, %u); = %c", ChannelID, pMsg, *pNumMsgs, Timeout, last_error);
+        if (!logSettings.IgnoreRead)
+            logger.LogData("PassThruReadMsgs(%u, %p, %u, %u); = %c", ChannelID, pMsg, *pNumMsgs, Timeout, last_error);
 
         return last_error;
     }
@@ -252,10 +276,10 @@ namespace JShark {
             }
         }
 
-        logger.LogData("PassThruWriteMsgs(%u, %p, %u, %u); = %c", ChannelID, pMsg, *pNumMsgs, Timeout, last_error);
+        if (!logSettings.IgnoreWrite)
+            logger.LogData("PassThruWriteMsgs(%u, %p, %u, %u); = %c", ChannelID, pMsg, *pNumMsgs, Timeout, last_error);
 
         last_error = _PassThruWriteMsgs(ChannelID, pMsg, pNumMsgs, Timeout);
-
 
         return last_error;
     }
@@ -270,8 +294,9 @@ namespace JShark {
             }
         }
 
-        //TODO: last_error is not this call's return status but fow now I don't care about it
-        logger.LogData("PassThruStartPeriodicMsg(%u, %p, %u, %u); = %c", ChannelID, pMsg, *pMsgID, TimeInterval, last_error);
+        if (!logSettings.IgnorePeriodics)
+            logger.LogData("PassThruStartPeriodicMsg(%u, %p, %u, %u); = %c", ChannelID, pMsg, *pMsgID, TimeInterval,
+                           last_error);
 
         last_error = _PassThruStartPeriodicMsg(ChannelID, pMsg, pMsgID, TimeInterval);
 
@@ -290,7 +315,8 @@ namespace JShark {
 
         last_error = _PassThruStopPeriodicMsg(ChannelID, MsgID);
 
-        logger.LogData("PassThruStopPeriodicMsg(%u, %u); = %c", ChannelID, MsgID, last_error);
+        if (!logSettings.IgnorePeriodics)
+            logger.LogData("PassThruStopPeriodicMsg(%u, %u); = %c", ChannelID, MsgID, last_error);
 
         return last_error;
     }
@@ -306,8 +332,9 @@ namespace JShark {
             }
         }
 
-        logger.LogData("PassThruStartMsgFilter(%u, %u, %p, %p, %p, %u); = %c", ChannelID, FilterType, pMaskMsg,
-                       pPatternMsg, pFlowControlMsg, pFilterID, last_error);
+        if (!logSettings.IgnoreFilters)
+            logger.LogData("PassThruStartMsgFilter(%u, %u, %p, %p, %p, %u); = %c", ChannelID, FilterType, pMaskMsg,
+                           pPatternMsg, pFlowControlMsg, pFilterID, last_error);
 
         last_error = _PassThruStartMsgFilter(ChannelID, FilterType, pMaskMsg, pPatternMsg, pFlowControlMsg, pFilterID);
 
@@ -327,7 +354,8 @@ namespace JShark {
 
         last_error = _PassThruStopMsgFilter(ChannelID, FilterID);
 
-        logger.LogData("PassThruStopMsgFilter(%u, %u); = %c", ChannelID, FilterID, last_error);
+        if(!logSettings.IgnoreFilters)
+            logger.LogData("PassThruStopMsgFilter(%u, %u); = %c", ChannelID, FilterID, last_error);
 
         return last_error;
     }
@@ -343,7 +371,8 @@ namespace JShark {
 
         last_error = _PassThruSetProgrammingVoltage(DeviceID, PinNumber, Voltage);
 
-        logger.LogData("PassThruSetProgrammingVoltage(%u, %u, %u); = %c", DeviceID, PinNumber, Voltage, last_error);
+        if(!logSettings.IgnoreSetVoltage)
+            logger.LogData("PassThruSetProgrammingVoltage(%u, %u, %u); = %c", DeviceID, PinNumber, Voltage, last_error);
 
         return last_error;
     }
@@ -362,7 +391,8 @@ namespace JShark {
         last_error = _PassThruReadVersion(DeviceID, pFirmwareVersion, pDllVersion, pApiVersion);
 
         //TODO(Demi): Figure out a safe way to pass strings to the logger
-//         logger.LogData("PassThruReadVersion(%u, %s, %s, %s); = %c", DeviceID, std::string(pFirmwareVersion).c_str(), std::string(pDllVersion).c_str(), std::string(pApiVersion).c_str(), last_error);
+        //if(!logSettings.IgnoreVersion)
+//            logger.LogData("PassThruReadVersion(%u, %s, %s, %s); = %c", DeviceID, std::string(pFirmwareVersion).c_str(), std::string(pDllVersion).c_str(), std::string(pApiVersion).c_str(), last_error);
 
         return last_error;
     }
@@ -379,7 +409,8 @@ namespace JShark {
 
         last_error = _PassThruGetLastError(pErrorDescription);
 
-        logger.LogData("PassThruGetLastError(%s); = %c", pErrorDescription, last_error);
+        if(!logSettings.IgnoreError)
+            logger.LogData("PassThruGetLastError(%s); = %c", pErrorDescription, last_error);
 
         return last_error;
     }
@@ -395,7 +426,8 @@ namespace JShark {
 
         last_error = _PassThruIoctl(ChannelID, IoctlID, pInput, pOutput);
 
-        logger.LogData("PassThruIoctl(%u, %u, %v, %v); = %c", ChannelID, IoctlID, pInput, pOutput, last_error);
+        if(!logSettings.IgnoreIoctl)
+            logger.LogData("PassThruIoctl(%u, %u, %v, %v); = %c", ChannelID, IoctlID, pInput, pOutput, last_error);
 
         return last_error;
     }

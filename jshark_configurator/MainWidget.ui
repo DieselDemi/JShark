@@ -7,13 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>540</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>400</width>
-    <height>300</height>
+    <height>540</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>400</width>
+    <height>540</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -52,9 +58,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>120</y>
+     <y>290</y>
      <width>381</width>
-     <height>171</height>
+     <height>241</height>
     </rect>
    </property>
    <property name="readOnly">
@@ -99,6 +105,102 @@
    <property name="text">
     <string>Remove JShark</string>
    </property>
+  </widget>
+  <widget class="QWidget" name="formLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>120</y>
+     <width>381</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <layout class="QFormLayout" name="formLayout">
+    <item row="0" column="0">
+     <widget class="QCheckBox" name="ignoreReadCheckBox">
+      <property name="text">
+       <string>Ignore Read</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QCheckBox" name="ignoreWirteCheckBox">
+      <property name="text">
+       <string>Ignore Write</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QCheckBox" name="ignoreVersionCheckBox">
+      <property name="text">
+       <string>Ignore Version</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QCheckBox" name="ignoreErrorCheckBox">
+      <property name="text">
+       <string>Ignore Error</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QCheckBox" name="ignoreIoctlCheckBox">
+      <property name="text">
+       <string>Ignore Ioctl</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QCheckBox" name="ignoreOpenCheckBox">
+      <property name="text">
+       <string>Ignore Open</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QCheckBox" name="ignoreSetVoltageCheckBox">
+      <property name="text">
+       <string>Ignore Set Voltage</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QCheckBox" name="ignorePeriodicsCheckBox">
+      <property name="text">
+       <string>Ignore Periodics</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QCheckBox" name="saveDataOutputCheckBox">
+      <property name="text">
+       <string>Save Data Output</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QCheckBox" name="ignoreFiltersCheckbox">
+      <property name="text">
+       <string>Ignore Filters</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QCheckBox" name="ignoreConnectCheckBox">
+      <property name="text">
+       <string>Ignore Connect</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QCheckBox" name="saveDataToSingleFileCheckBox">
+      <property name="text">
+       <string>Save Data To Single File</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
