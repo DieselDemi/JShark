@@ -94,10 +94,10 @@ namespace jshark::forms {
             QString functionLibrary = this->ui->deviceComboBox->currentData().toString();
 
             settings.beginGroup("JSHARK");
+            //J2534 Reg settings
             settings.setValue("CAN", 0x1);
             settings.setValue("ConfigApplication", "JSharkConfigurator.exe");
             settings.setValue("DeviceId", 0x0);
-            settings.setValue("DllPath", functionLibrary);
             settings.setValue("FunctionLibrary", "C:\\JSHARK.dll"); //TODO
             settings.setValue("IOS14230", 0x1);
             settings.setValue("ISO14230_CH1", 0x1);
@@ -110,22 +110,26 @@ namespace jshark::forms {
             settings.setValue("ISO9141_CH3", 0x1);
             settings.setValue("J1850PWM", 0x1);
             settings.setValue("J1850VPW", 0x1);
-            settings.setValue("LogPath", filePath);
             settings.setValue("Name", "JSHARK Shim");
             settings.setValue("Vendor", "Diesel Demi");
 
-            settings.setValue("IgnoreRead", false); //TODO(Demi): Add the checkbox values here
-            settings.setValue("IgnoreWrite", false); //TODO(Demi): Add the checkbox values here
-            settings.setValue("IgnoreIoctl", false); //TODO(Demi): Add the checkbox values here
-            settings.setValue("IgnoreVersion", false); //TODO(Demi): Add the checkbox values here
-            settings.setValue("IgnoreOpen", false); //TODO(Demi): Add the checkbox values here
-            settings.setValue("IgnoreError", false); //TODO(Demi): Add the checkbox values here
-            settings.setValue("IgnoreSetVoltage", false); //TODO(Demi): Add the checkbox values here
-            settings.setValue("IgnoreFilters", false); //TODO(Demi): Add the checkbox values here
-            settings.setValue("IgnorePeriodics", false); //TODO(Demi): Add the checkbox values here
-            settings.setValue("IgnoreConnect", false); //TODO(Demi): Add the checkbox values here
-            settings.setValue("SaveDataOutput", true); //TODO(Demi): Add the checkbox values here
-            settings.setValue("SaveDataToSingleFile", true); //TODO(Demi): Add the checkbox values here
+            //Shim settings
+            settings.setValue("DllPath", functionLibrary);
+
+            //Log settings
+            settings.setValue("LogPath", filePath);
+            settings.setValue("IgnoreRead", ui->ignoreReadCheckBox->isChecked());
+            settings.setValue("IgnoreWrite", ui->ignoreWirteCheckBox->isChecked());
+            settings.setValue("IgnoreIoctl", ui->ignoreIoctlCheckBox->isChecked());
+            settings.setValue("IgnoreVersion", ui->ignoreVersionCheckBox->isChecked());
+            settings.setValue("IgnoreOpen", ui->ignoreOpenCheckBox->isChecked());
+            settings.setValue("IgnoreError", ui->ignoreErrorCheckBox->isChecked());
+            settings.setValue("IgnoreSetVoltage", ui->ignoreSetVoltageCheckBox->isChecked());
+            settings.setValue("IgnoreFilters", ui->ignoreFiltersCheckbox->isChecked());
+            settings.setValue("IgnorePeriodics", ui->ignorePeriodicsCheckBox->isChecked());
+            settings.setValue("IgnoreConnect", ui->ignoreConnectCheckBox->isChecked());
+            settings.setValue("SaveDataOutput", ui->saveDataOutputCheckBox->isChecked());
+            settings.setValue("SaveDataToSingleFile", ui->saveDataToSingleFileCheckBox->isChecked());
             settings.endGroup();
 
         } catch (std::exception &e) {
