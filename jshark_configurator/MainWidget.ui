@@ -135,6 +135,9 @@
       <property name="text">
        <string>Ignore Version</string>
       </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
      </widget>
     </item>
     <item row="2" column="1">
@@ -142,12 +145,18 @@
       <property name="text">
        <string>Ignore Error</string>
       </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
      </widget>
     </item>
     <item row="1" column="0">
      <widget class="QCheckBox" name="ignoreIoctlCheckBox">
       <property name="text">
        <string>Ignore Ioctl</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -177,6 +186,9 @@
       <property name="text">
        <string>Save Data Output</string>
       </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
      </widget>
     </item>
     <item row="3" column="1">
@@ -197,6 +209,9 @@
      <widget class="QCheckBox" name="saveDataToSingleFileCheckBox">
       <property name="text">
        <string>Save Data To Single File</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
