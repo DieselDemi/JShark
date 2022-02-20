@@ -363,11 +363,16 @@ namespace JShark {
         std::string path;
 
         if(logSettings.SaveDataToSingleFile)
+        {
             path = JShark::Helpers::StringHelpers::FileNameToPath(fileName) + "data.bin";
+            dataFile.open(path, std::ios::binary | std::ios::app);
+        }
         else
+        {
             path = JShark::Helpers::StringHelpers::FileNameToPath(fileName) + fileNameId;
+            dataFile.open(path, std::ios::binary | std::ios::out);
+        }
 
-        dataFile.open(path, std::ios::binary | std::ios::out);
 
         if (pMsg->DataSize > 4128)
             return; //Don't process a struct that is too big, fail and bail
