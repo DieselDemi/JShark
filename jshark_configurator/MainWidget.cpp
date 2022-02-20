@@ -118,18 +118,18 @@ namespace jshark::forms {
 
             //Log settings
             settings.setValue("LogPath", filePath);
-            settings.setValue("IgnoreRead", ui->ignoreReadCheckBox->isChecked());
-            settings.setValue("IgnoreWrite", ui->ignoreWirteCheckBox->isChecked());
-            settings.setValue("IgnoreIoctl", ui->ignoreIoctlCheckBox->isChecked());
-            settings.setValue("IgnoreVersion", ui->ignoreVersionCheckBox->isChecked());
-            settings.setValue("IgnoreOpen", ui->ignoreOpenCheckBox->isChecked());
-            settings.setValue("IgnoreError", ui->ignoreErrorCheckBox->isChecked());
-            settings.setValue("IgnoreSetVoltage", ui->ignoreSetVoltageCheckBox->isChecked());
-            settings.setValue("IgnoreFilters", ui->ignoreFiltersCheckbox->isChecked());
-            settings.setValue("IgnorePeriodics", ui->ignorePeriodicsCheckBox->isChecked());
-            settings.setValue("IgnoreConnect", ui->ignoreConnectCheckBox->isChecked());
-            settings.setValue("SaveDataOutput", ui->saveDataOutputCheckBox->isChecked());
-            settings.setValue("SaveDataToSingleFile", ui->saveDataToSingleFileCheckBox->isChecked());
+            settings.setValue("IgnoreRead", (int)ui->ignoreReadCheckBox->isChecked());
+            settings.setValue("IgnoreWrite", (int)ui->ignoreWirteCheckBox->isChecked());
+            settings.setValue("IgnoreIoctl", (int)ui->ignoreIoctlCheckBox->isChecked());
+            settings.setValue("IgnoreVersion", (int)ui->ignoreVersionCheckBox->isChecked());
+            settings.setValue("IgnoreOpen", (int)ui->ignoreOpenCheckBox->isChecked());
+            settings.setValue("IgnoreError", (int)ui->ignoreErrorCheckBox->isChecked());
+            settings.setValue("IgnoreSetVoltage", (int)ui->ignoreSetVoltageCheckBox->isChecked());
+            settings.setValue("IgnoreFilters", (int)ui->ignoreFiltersCheckbox->isChecked());
+            settings.setValue("IgnorePeriodics", (int)ui->ignorePeriodicsCheckBox->isChecked());
+            settings.setValue("IgnoreConnect", (int)ui->ignoreConnectCheckBox->isChecked());
+            settings.setValue("SaveDataOutput", (int)ui->saveDataOutputCheckBox->isChecked());
+            settings.setValue("SaveDataToSingleFile", (int)ui->saveDataToSingleFileCheckBox->isChecked());
             settings.endGroup();
 
         } catch (std::exception &e) {

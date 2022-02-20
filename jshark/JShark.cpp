@@ -133,35 +133,75 @@ namespace JShark {
             return false;
 
         if (JSharkRegistry::GetStringRegKey(hKey, L"DllPath", dllFilePath, L"") != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting DllPath");
             return false;
+        }
         if (JSharkRegistry::GetStringRegKey(hKey, L"LogPath", wLogFilePath, L"output.log") != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting LogPath");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreRead", logSettings.IgnoreRead, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreRead", logSettings.IgnoreRead, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting IgnoreRead");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreWrite", logSettings.IgnoreWrite, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreWrite", logSettings.IgnoreWrite, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting IgnoreWrite");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreIoctl", logSettings.IgnoreIoctl, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreIoctl", logSettings.IgnoreIoctl, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting IgnoreIoctl");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreVersion", logSettings.IgnoreVersion, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreVersion", logSettings.IgnoreVersion, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting IgnoreVersion");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreOpen", logSettings.IgnoreOpen, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreOpen", logSettings.IgnoreOpen, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting IgnoreOpen");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreError", logSettings.IgnoreError, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreError", logSettings.IgnoreError, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting IgnoreError");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreSetVoltage", logSettings.IgnoreSetVoltage, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreSetVoltage", logSettings.IgnoreSetVoltage, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting IgnoreSetVoltage");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreFilters", logSettings.IgnoreFilters, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreFilters", logSettings.IgnoreFilters, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting IgnoreFilters");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnorePeriodics", logSettings.IgnorePeriodics, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnorePeriodics", logSettings.IgnorePeriodics, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting IgnorePeriodics");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreConnect", logSettings.IgnoreConnect, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"IgnoreConnect", logSettings.IgnoreConnect, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting IgnoreConnect");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"SaveDataOutput", logSettings.SaveDataOutput, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"SaveDataOutput", logSettings.SaveDataOutput, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting SaveDataOutput");
             return false;
-        if (JSharkRegistry::GetBoolRegKey(hKey, L"SaveDataToSingleFile", logSettings.SaveDataToSingleFile, false))
+        }
+        if (JSharkRegistry::GetBoolRegKey(hKey, L"SaveDataToSingleFile", logSettings.SaveDataToSingleFile, false) != ERROR_SUCCESS)
+        {
+            JShark::Helpers::MessageBoxHelpers::ShowMessageBox("Error", "Could not read registry setting SaveDataToSingleFile");
             return false;
-
-        //TODO(Demi): Add all the settings here
+        }
 
         //FUCK WINDOWS AND EVERYTHING IT STANDS FOR
         logFilePath = Helpers::StringHelpers::ToStdString(wLogFilePath);
