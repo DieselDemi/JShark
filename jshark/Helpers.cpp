@@ -3,28 +3,70 @@
 
 #include <codecvt>
 #include <locale>
+#include <sstream>
 
 namespace JShark::Helpers {
-    void MessageBoxHelper::ShowMessageBox(std::string message) {
-        MessageBoxW(
-                NULL,
-                StringConversion::ToWString(message).c_str(),
-                (LPCWSTR) L"Account Details",
-                MB_ICONWARNING | MB_OK
-        );
+    namespace MessageBoxHelpers {
+        void ShowMessageBox(const std::string &title, const std::string &message) {
+            MessageBoxW(
+                    nullptr,
+                    StringHelpers::ToWString(message).c_str(),
+                    (LPCWSTR) StringHelpers::ToWString(title).c_str(),
+                    MB_ICONWARNING | MB_OK
+            );
+        }
     }
 
-    std::wstring StringConversion::ToWString(std::string str) {
-        using convert_t = std::codecvt_utf8<wchar_t>;
-        std::wstring_convert<convert_t, wchar_t> strconverter;
+    namespace StringHelpers {
 
-        return strconverter.from_bytes(str);
-    }
+        std::vector<std::string> Split(std::string& in, char delim) {
+            std::vector<std::string> output;
 
-    std::string StringConversion::ToStdString(std::wstring wstr) {
-        using convert_t = std::codecvt_utf8<wchar_t>;
-        std::wstring_convert<convert_t, wchar_t> strconverter;
+            std::string::size_type prev_pos = 0, pos = 0;
 
-        return strconverter.to_bytes(wstr);
+            while((pos = in.find(delim, pos)) != std::string::npos)
+            {
+                std::string substring(in.substr(prev_pos, pos-prev_pos) );
+
+                output.push_back(substring);
+
+                prev_pos = ++pos;
+            }
+
+            output.push_back(in.substr(prev_pos, pos-prev_pos)); // Last word
+
+            return output;
+        }
+
+        std::string FileNameToPath(std::string& fileName) {
+            std::vector<std::string> filePathList = Split(fileName, '/');
+            filePathList.pop_back();
+
+            return Join(filePathList, '/');
+        }
+
+        std::wstring ToWString(const std::string& str) {
+            using convert_t = std::codecvt_utf8<wchar_t>;
+            std::wstring_convert<convert_t, wchar_t> strconverter;
+
+            return strconverter.from_bytes(str);
+        }
+
+        std::string ToStdString(const std::wstring& wstr) {
+            using convert_t = std::codecvt_utf8<wchar_t>;
+            std::wstring_convert<convert_t, wchar_t> strconverter;
+
+            return strconverter.to_bytes(wstr);
+        }
+
+        std::string Join(std::vector<std::string> &list, char delim) {
+            std::stringstream ss;
+
+            for(const auto& str : list){
+                ss << str << delim << std::flush;
+            }
+
+            return ss.str();
+        }
     }
 }

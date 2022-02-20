@@ -1,11 +1,17 @@
 #include "stdafx.h"
 #include "Logger.h"
+#include "Helpers.h"
 
 #include <iomanip>
 #include <sstream>
+#include <utility>
 
 namespace JShark {
-    Logger::Logger(std::string fileName) : fileName(std::move(fileName)) {}
+    Logger::Logger(std::string fileName)
+            : fileName(std::move(fileName)) {/*No Construction*/}
+
+    Logger::Logger(std::string fileName, LogSettings &logSettings)
+            : fileName(std::move(fileName)), logSettings(logSettings) {/*No Construction*/}
 
     bool Logger::OpenLog() {
         if (!this->fileName.empty()) {
@@ -16,123 +22,100 @@ namespace JShark {
         return true;
     }
 
-    bool Logger::OpenLog(const std::string &fileName) {
+    bool Logger::OpenLog(const std::string &fileName, LogSettings logSettings) {
         this->fileName = fileName;
         file.open(fileName, std::fstream::out | std::fstream::app);
         file << "------ NEW LOG ------" << std::endl << std::flush;
 
+        this->logSettings = logSettings;
+
         return true;
     }
 
-    void Logger::LogData(std::string fmt, ulong retCode, ...) {
+    void Logger::LogData(const char *fmt, ...) {
         va_list args;
                 va_start(args, fmt);
 
-        for (auto iter = fmt.begin(); iter != fmt.end(); ++iter) {
-            if (*iter == '%') {
-                switch (*(iter + 1)) {
+        while (*fmt != '\0') {
+            if (*fmt == '%') {
+                switch (*(fmt + 1)) {
+                    case 'c': //Return Code
+                    {
+                        const ulong ret = va_arg(args, ulong);
+                        file << ToReturnCode(ret) << std::endl << std::flush;
+                        ++fmt;
+                        break;
+                    }
                     case 'r': //ULONG to ProtocolID
                     {
                         const ulong out = va_arg(args, ulong);
                         file << ToProtocolId(out) << std::flush;
-                        ++iter;
-                    }
+                        ++fmt;
                         break;
+                    }
                     case 'u': //ULONG
                     {
                         const ulong out = va_arg(args, ulong);
                         file << std::to_string(out) << std::flush;
-                        ++iter;
-                    }
+                        ++fmt;
                         break;
+                    }
                     case 'x': //ULONG as HEX
                     {
                         const ulong out = va_arg(args, ulong);
                         file << "0x" << std::hex << std::setw(sizeof(ulong) / 8) << std::setfill('0') <<
                              std::to_string(out) << std::flush;
-                        ++iter;
-                    }
+                        ++fmt;
                         break;
+                    }
                     case 'v': //Void Pointer
                     {
                         file << "*void" << std::flush;
-                        ++iter;
-                    }
+                        ++fmt;
                         break;
+                    }
                     case 'p': //PassThru Message
                     {
-                        PASSTHRU_MSG *pMsg = &va_arg(args, PASSTHRU_MSG);
+                        auto *pMsg = va_arg(args, PASSTHRU_MSG*);
 
                         if (pMsg == nullptr) {
-                            ++iter;
+                            ++fmt;
                             break;
                         }
 
+                        LogPassThruMessage(pMsg);
 
-                        file << "{" << std::endl << std::flush;
-                        file << "\tProtocol ID: " << std::hex << pMsg->ProtocolID << " (" <<
-                             ToProtocolId(pMsg->ProtocolID) << ")" << std::endl << std::flush;
-                        file << "\tRxStatus: " << std::hex << pMsg->RxStatus << std::endl << std::flush;
-                        file << "\tTxFlags: " << std::hex << pMsg->TxFlags << " (" << ToTxFlags(pMsg->TxFlags) << ")" <<
-                             std::endl << std::flush;
-                        file << "\tExtraData Idx: " << std::hex << pMsg->ExtraDataIndex << std::endl << std::flush;
-                        file << "\tDataSize: " << pMsg->DataSize << std::endl << std::flush;
-                        file << "\tTimeStamp: " << pMsg->Timestamp << std::endl << std::flush;
-                        file << "\tData: " << std::endl << std::flush;
-                        if (pMsg->DataSize > 4128) {
-                            file << "\t{\n\t\tINVALID PASSTHRU DATA\n\t}\n" << std::flush;
-                        } else if (pMsg->DataSize == 0) {
-                            file << "\t{}\n" << std::flush;
-                        } else {
-                            for (size_t i = 0; i < pMsg->DataSize; i++) {
-                                if (i % 0x0F == 0)
-                                    file << std::endl << std::flush;
-
-                                file << "\t" << std::hex << pMsg->Data[i] << std::flush;
-                            }
-                        }
-
-                        file << std::endl << std::flush;
-
-                        file << "}" << std::endl << std::flush;
-
-                        ++iter;
-                    }
+                        ++fmt;
                         break;
+                    }
                     case 's': //char* string
                     {
-                        //TODO(): This doesn't work
-                        char *string = va_arg(args, char*);
-
-                        if (string == nullptr) {
-                            ++iter;
-                            break;
-                        }
-
-                        file << "\"" << std::flush;
-                        while (*string != '\0') {
-                            file << *string << std::flush;
-                        }
-                        file << "\"" << std::flush;
-                        // }string << "\"" << std::flush;
-                        ++iter;
-                    }
+                        std::string string = va_arg(args, std::string);
+                        file << "\"" << string << "\"" << std::flush;
+                        ++fmt;
                         break;
+                    }
                     default:
-                        ++iter;
+                        file << *fmt << std::flush;
+                        break;
                 }
             } else {
-                file << *iter << std::flush;
+                file << *fmt << std::flush;
             }
+            ++fmt;
         }
 
                 va_end(args);
 
-        file << " " << ToReturnCode(retCode) << std::endl << std::flush;
+        file << std::endl << std::flush;
     }
 
-    void Logger::LogError(std::string Message) {
+    void Logger::LogMessage(const std::string &Message) {
         file << Message << std::endl << std::flush;
+    }
+
+    void Logger::LogMessage(const std::string &Tag, const std::string &Message) {
+        file << Tag << ": " << Message << std::endl;
     }
 
     void Logger::CloseLog() {
@@ -231,9 +214,9 @@ namespace JShark {
     std::string Logger::ToTxFlags(unsigned long TxFlags) {
         //TODO: Too lazy to implement correctly at the moment
 
-        if (TxFlags > (ISO15765_FRAME_PAD | ISO15765_ADDR_TYPE | CAN_29BIT_ID | WAIT_P3_MIN_ONLY | SW_CAN_HV_TX |
-                       SCI_MODE | SCI_TX_VOLTAGE | DT_PERIODIC_UPDATE))
-            return "";
+//        if (TxFlags > (ISO15765_FRAME_PAD | ISO15765_ADDR_TYPE | CAN_29BIT_ID | WAIT_P3_MIN_ONLY | SW_CAN_HV_TX |
+//                       SCI_MODE | SCI_TX_VOLTAGE | DT_PERIODIC_UPDATE))
+//            return "";
 
         std::stringstream retStream;
 
@@ -253,7 +236,152 @@ namespace JShark {
             retStream << "(SCI_TX_VOLTAGE)" << std::flush;
         if (TxFlags & DT_PERIODIC_UPDATE)
             retStream << "(DT_PERIODIC_UPDATE)" << std::flush;
+        if (TxFlags & CAN_ID_BOTH)
+            retStream << "(CAN_ID_BOTH)" << std::flush;
 
         return retStream.str();
+    }
+
+    std::string Logger::ToRxStatus(unsigned long RxStatus) {
+
+//        if (RxStatus > (START_OF_MESSAGE | ISO15765_FIRST_FRAME | ISO15765_EXT_ADDR | RX_BREAK | TX_INDICATION |
+//                ISO15765_PADDING_ERROR | ISO15765_ADDR_TYPE | CAN_29BIT_ID |
+//                SW_CAN_NS_RX | SW_CAN_HS_RX | SW_CAN_HV_RX ))
+//            return "";
+
+        std::stringstream retStream;
+
+        if (RxStatus & TX_MSG_TYPE)
+            retStream << "(TX_MSG_TYPE)" << std::flush;
+        if (RxStatus & START_OF_MESSAGE)
+            retStream << "(START_OF_MESSAGE)" << std::flush;
+        if (RxStatus & ISO15765_FIRST_FRAME)
+            retStream << "(ISO15765_FIRST_FRAME)" << std::flush;
+        if (RxStatus & ISO15765_EXT_ADDR)
+            retStream << "(ISO15765_EXT_ADDR)" << std::flush;
+        if (RxStatus & RX_BREAK)
+            retStream << "(RX_BREAK)" << std::flush;
+        if (RxStatus & TX_INDICATION)
+            retStream << "(TX_INDICATION)" << std::flush;
+        if (RxStatus & ISO15765_PADDING_ERROR)
+            retStream << "(ISO15765_PADDING_ERROR)" << std::flush;
+        if (RxStatus & ISO15765_ADDR_TYPE)
+            retStream << "(ISO15765_ADDR_TYPE)" << std::flush;
+        if (RxStatus & CAN_29BIT_ID)
+            retStream << "(CAN_29BIT_ID)" << std::flush;
+        if (RxStatus & SW_CAN_NS_RX)
+            retStream << "(SW_CAN_NS_RX)" << std::flush;
+        if (RxStatus & SW_CAN_HS_RX)
+            retStream << "(SW_CAN_HS_RX)" << std::flush;
+        if (RxStatus & SW_CAN_HV_RX)
+            retStream << "(SW_CAN_HV_RX)" << std::flush;
+
+
+        return retStream.str();
+    }
+
+    void Logger::LogPassThruMessage(PASSTHRU_MSG *pMsg) {
+        file << "{" << std::endl << std::flush;
+
+        //Protocol ID
+        file << "\tProtocol ID: 0x" << std::hex << pMsg->ProtocolID << " (" <<
+             ToProtocolId(pMsg->ProtocolID) << ")" << std::endl << std::flush;
+
+        //Rx Status
+        if (logSettings.MessageType == TransmitMessageType::RX)
+            file << "\tRxStatus: 0x" << std::hex << pMsg->RxStatus <<
+                 " (" << ToRxStatus(pMsg->RxStatus) << ")" << std::endl << std::flush;
+        else
+            file << "\tRxStatus:" << std::endl << std::flush;
+
+        //Tx Flags
+        if (logSettings.MessageType == TransmitMessageType::TX)
+            file << "\tTxFlags: 0x" << std::hex << pMsg->TxFlags <<
+                 " (" << ToTxFlags(pMsg->TxFlags) << ")" << std::endl << std::flush;
+        else
+            file << "\tTxFlags:" << std::endl << std::flush;
+
+        //Timestamp
+        file << "\tTimeStamp: " << std::to_string(pMsg->Timestamp) << std::endl << std::flush;
+
+        //DataSize
+        file << "\tDataSize: " << std::to_string(pMsg->DataSize) << std::endl << std::flush;
+
+        //ExtraData Index
+        file << "\tExtraData Idx: " << std::to_string(pMsg->ExtraDataIndex) << std::endl
+             << std::flush;
+
+        file << "\tData: " << std::flush;
+
+        if (pMsg->DataSize == 0 || pMsg->DataSize > 4128) {
+            file << "\t[]\n" << std::flush;
+        } else {
+            if (logSettings.SaveDataOutput) {
+                std::stringstream fileNameSS;
+
+                fileNameSS << "data" << ++passThruMessageId << ".bin" << std::flush;
+
+                LogMessageData(fileNameSS.str(), pMsg);
+                if(logSettings.SaveDataToSingleFile)
+                    file << "data.bin" << std::flush;
+                else
+                    file << fileNameSS.str() << std::flush;
+            } else {
+                file << std::endl << std::flush;
+                if (!(logSettings.BinaryDisplayType & DataDisplayType::NO_DISPLAY)) {
+                    file << "\t[\t" << std::flush;
+                    for (size_t i = 0; i < pMsg->DataSize; i++) {
+                        if (i % 0x0F == 0)
+                            file << std::endl << "\t" << std::flush;
+
+                        if (logSettings.BinaryDisplayType & DataDisplayType::PRECEDING_ZERO_X)
+                            file << "0x" << std::flush;
+                        if (logSettings.BinaryDisplayType & DataDisplayType::ASCII_HEX_VALUES)
+                            file << std::hex << (pMsg->Data[i] - '0') << std::flush;
+                        if (logSettings.BinaryDisplayType & DataDisplayType::HEX_VALUES_IN_TEXT)
+                            file << std::hex << pMsg->Data[i] << std::flush;
+                        if (logSettings.BinaryDisplayType & DataDisplayType::COMMA_DELIM)
+                            file << ", " << std::flush;
+                        if ((logSettings.BinaryDisplayType & DataDisplayType::RAW) &&
+                            !(logSettings.BinaryDisplayType &
+                              (DataDisplayType::ASCII_HEX_VALUES | DataDisplayType::HEX_VALUES_IN_TEXT)))
+                            file << pMsg->Data[i] << std::flush;
+                    }
+                    file << "\n\t]" << std::flush;
+                } else {
+                    file << "[]" << std::flush;
+                }
+            }
+        }
+
+        file << std::endl << std::flush;
+
+        file << "}" << std::flush;
+    }
+
+    void Logger::LogMessageData(const std::string &fileNameId, PASSTHRU_MSG *pMsg) {
+        std::string path;
+
+        if(logSettings.SaveDataToSingleFile)
+            path = JShark::Helpers::StringHelpers::FileNameToPath(fileName) + "data.bin";
+        else
+            path = JShark::Helpers::StringHelpers::FileNameToPath(fileName) + fileNameId;
+
+        dataFile.open(path, std::ios::binary | std::ios::out);
+
+        if (pMsg->DataSize > 4128)
+            return; //Don't process a struct that is too big, fail and bail
+
+        for (size_t i = 0; i < pMsg->DataSize; i++)
+            dataFile << pMsg->Data[i] << std::flush;
+
+        if(logSettings.SaveDataToSingleFile)
+            dataFile << "---DATA-BLOCK---" << std::flush;
+
+        dataFile.close();
+    }
+
+    void Logger::SetMessageType(TransmitMessageType messageType) {
+        this->logSettings.MessageType = messageType;
     }
 }

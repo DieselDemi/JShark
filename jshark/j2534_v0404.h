@@ -213,7 +213,7 @@
 //   messages sent on the vehicle network is placed in <NumMsgs>.
 #define ERR_TIMEOUT					0x09
 
-// Invalid message structure pointed to by pMsg (Reference Section 8 – Message Structure)
+// Invalid message structure pointed to by pMsg (Reference Section 8 ï¿½ Message Structure)
 #define ERR_INVALID_MSG				0x0A
 
 // Invalid TimeInterval value
@@ -304,8 +304,8 @@
 // data by the interface
 #define ISO9141_NO_CHECKSUM				0x00000200
 
-// 0 = either standard or extended CAN ID types used – CAN ID type defined by bit 8
-// 1 = both standard and extended CAN ID types used – if the CAN controller allows prioritizing either standard
+// 0 = either standard or extended CAN ID types used ï¿½ CAN ID type defined by bit 8
+// 1 = both standard and extended CAN ID types used ï¿½ if the CAN controller allows prioritizing either standard
 // (11 bit) or extended (29 bit) CAN ID's then bit 8 will determine the higher priority ID type
 #define CAN_ID_BOTH						0x00000800
 
@@ -400,7 +400,7 @@ typedef struct _PASSTHRU_MSG
 	// Protocol type
 	unsigned long ProtocolID;
 
-	// Receive message status – See RxStatus in "Message Flags and Status Definition" section
+	// Receive message status See RxStatus in "Message Flags and Status Definition" section
 	unsigned long RxStatus;
 
 	// Transmit message flags
