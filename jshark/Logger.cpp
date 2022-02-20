@@ -381,7 +381,14 @@ namespace JShark {
             dataFile << pMsg->Data[i] << std::flush;
 
         if(logSettings.SaveDataToSingleFile)
+        {
+            size_t rem = (0x0f - pMsg->DataSize) + 1;
+
+            for(size_t i = 0; i < rem; i++)
+                dataFile << '\0' << std::flush;
+
             dataFile << "---DATA-BLOCK---" << std::flush;
+        }
 
         dataFile.close();
     }
